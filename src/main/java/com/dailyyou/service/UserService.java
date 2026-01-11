@@ -20,13 +20,19 @@ public class UserService {
     @Transactional
     public void registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException("Username '" + user.getUsername() + "' is already taken.");
         }
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException("An account with email '" + user.getEmail() + "' already exists.");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // Hash the security answer too, so it's private
+        if (user.getSecurityAnswer() != null) {
+            user.setSecurityAnswer(passwordEncoder.encode(user.getSecurityAnswer().toLowerCase().trim()));
+        }
+        
         userRepository.save(user);
     }
     

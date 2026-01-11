@@ -35,9 +35,9 @@ public class DiaryController {
     }
 
     @GetMapping("/form")
-    public String showForm(Model model) {
+    public String showForm(Model model, @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate date) {
         EntryRequestDTO dto = new EntryRequestDTO();
-        dto.setDate(LocalDate.now()); // Default to today
+        dto.setDate(date != null ? date : LocalDate.now());
         model.addAttribute("entryDto", dto);
         return "diary/form";
     }

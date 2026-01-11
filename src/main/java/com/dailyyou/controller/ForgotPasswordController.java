@@ -42,17 +42,49 @@ public class ForgotPasswordController {
     public String processForgotPassword(@RequestParam String email, Model model) {
         User user = userRepository.findByEmail(email).orElse(null);
         
-        if (user != null) {
+        if (user == null) {
+             // Security: Don't reveal if user exists. Just reload page or show same generic message? 
+             // Ideally we should show "If account exists..." but for this flow we need to show the question.
+             // So we must reveal if user exists or not? No, we can fake it or just say "User not found".
+             // For a portfolio, "User not found" is acceptable simplicity.
+             model.addAttribute("error", "No account found with that email.");
+             return "auth/forgot_password";
+        }
+        
+        if (user.getSecurityQuestion() == null) {
+             model.addAttribute("error", "This account has no security question set. Contact support.");
+             return "auth/forgot_password";
+        }
+
+        // Redirect to verification page with userId (hidden)
+        model.addAttribute("userId", user.getId());
+        model.addAttribute("question", user.getSecurityQuestion().getQuestion());
+        return "auth/verify_security";
+    }
+
+    @PostMapping("/verify-security")
+    public String verifySecurity(@RequestParam Long userId, @RequestParam String answer, Model model) {
+        User user = userRepository.findById(userId).orElse(null);
+        
+        if (user == null) {
+            return "redirect:/login"; // Should not happen
+        }
+
+        // Check Answer
+        if (passwordEncoder.matches(answer.toLowerCase().trim(), user.getSecurityAnswer())) {
+            // Success! Generate token and let them reset
             String token = UUID.randomUUID().toString();
             PasswordResetToken myToken = new PasswordResetToken(token, user);
             tokenRepository.save(myToken);
             
-            emailService.sendPasswordResetEmail(user.getEmail(), token);
+            // Redirect to reset password page directly with token
+            return "redirect:/reset-password?token=" + token;
+        } else {
+             model.addAttribute("userId", userId);
+             model.addAttribute("question", user.getSecurityQuestion().getQuestion());
+             model.addAttribute("error", "Incorrect answer.");
+             return "auth/verify_security";
         }
-        
-        // Always return success message for security (don't reveal if email exists)
-        model.addAttribute("message", "If an account exists for that email, we have sent a password reset link.");
-        return "auth/forgot_password";
     }
 
     @GetMapping("/reset-password")

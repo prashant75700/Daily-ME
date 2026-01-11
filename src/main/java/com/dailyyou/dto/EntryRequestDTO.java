@@ -29,6 +29,7 @@ public class EntryRequestDTO {
 
     @NotNull(message = "Date is required")
     @PastOrPresent(message = "Date cannot be in the future")
+    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
     private LocalDate date;
 
     private MultipartFile image; // Can be null if no image uploaded

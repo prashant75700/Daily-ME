@@ -2,9 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Join - Daily You</title>
+    <title>Join - Daily ME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://img.icons8.com/fluency/48/brain.png" type="image/png">
     <style>
         body {
             font-family: 'Outfit', sans-serif;
@@ -54,6 +55,31 @@
                 <input type="password" th:field="*{password}" required
                     class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none transition text-white placeholder-slate-500"
                     placeholder="••••••••">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Date of Birth</label>
+                    <input type="date" th:field="*{dob}" required
+                        class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none transition text-white placeholder-slate-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Security Question</label>
+                <select th:field="*{securityQuestion}" required
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none transition text-white appearance-none">
+                    <option value="" disabled selected>Select a question...</option>
+                    <option th:each="q : ${T(com.dailyyou.entity.SecurityQuestion).values()}" th:value="${q}"
+                        th:text="${q.question}"></option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Answer</label>
+                <input type="text" th:field="*{securityAnswer}" required
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none transition text-white placeholder-slate-500"
+                    placeholder="Your answer...">
             </div>
 
             <button type="submit"
