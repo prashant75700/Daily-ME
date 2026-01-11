@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +25,13 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    private java.time.LocalDate dob;
+
+    @Enumerated(EnumType.STRING)
+    private SecurityQuestion securityQuestion;
+
+    private String securityAnswer;
 
     // Constructors, Getters, Setters
 
@@ -64,5 +73,29 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public java.time.LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(java.time.LocalDate dob) {
+        this.dob = dob;
+    }
+
+    public SecurityQuestion getSecurityQuestion() {
+        return securityQuestion;
+    }
+
+    public void setSecurityQuestion(SecurityQuestion securityQuestion) {
+        this.securityQuestion = securityQuestion;
+    }
+
+    public String getSecurityAnswer() {
+        return securityAnswer;
+    }
+
+    public void setSecurityAnswer(String securityAnswer) {
+        this.securityAnswer = securityAnswer;
     }
 }
