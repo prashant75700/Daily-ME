@@ -41,8 +41,23 @@ public class DiaryService {
 
     @Transactional
     public void saveEntry(User user, EntryRequestDTO dto) {
-        DiaryEntry entry = new DiaryEntry();
-        entry.setUser(user);
+        DiaryEntry entry;
+        
+        if (dto.getId() != null) {
+            // Update existing
+            entry = entryRepository.findById(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Entry not found"));
+            
+            // Security check
+            if (!entry.getUser().getId().equals(user.getId())) {
+                throw new SecurityException("You can only edit your own entries");
+            }
+        } else {
+            // Create new
+            entry = new DiaryEntry();
+            entry.setUser(user);
+        }
+
         entry.setContent(dto.getContent());
         entry.setDate(dto.getDate());
         entry.setMood(dto.getMood());
@@ -62,6 +77,28 @@ public class DiaryService {
         }
 
         entryRepository.save(entry);
+    }
+
+    @Transactional
+    public void deleteEntry(Long id, User user) {
+        DiaryEntry entry = entryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Entry not found"));
+        
+        if (!entry.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("You can only delete your own entries");
+        }
+        
+        entryRepository.delete(entry);
+    }
+    
+    public DiaryEntry getEntry(Long id, User user) {
+         DiaryEntry entry = entryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Entry not found"));
+        
+        if (!entry.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Access denied");
+        }
+        return entry;
     }
     
     public List<DiaryEntry> getUserEntries(User user) {

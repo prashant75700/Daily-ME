@@ -37,6 +37,8 @@
         <form th:action="@{/diary/save}" th:object="${entryDto}" method="post" enctype="multipart/form-data"
             class="p-6 sm:p-8 space-y-6">
 
+            <input type="hidden" th:field="*{id}">
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Date -->
                 <div>

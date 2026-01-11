@@ -10,8 +10,19 @@ import java.time.LocalDate;
 
 public class EntryRequestDTO {
 
+    private Long id; // Null for new entries, present for updates
+
     @Size(min = 1, message = "Content cannot be empty")
     private String content;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
     @NotNull(message = "Please select a mood")
     private Mood mood;

@@ -21,7 +21,6 @@
 
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-    <!-- Navbar (Simplified) -->
     <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -29,70 +28,86 @@
                     <i class="fas fa-arrow-left"></i>
                     <span class="font-bold">Back to Dashboard</span>
                 </a>
-                <span class="font-semibold text-lg" th:text="${#months.monthName(month)} + ' ' + ${year}">January
-                    2024</span>
+                <span class="font-semibold text-lg" th:text="${monthName} + ' ' + ${year}">January 2024</span>
             </div>
         </div>
     </nav>
 
     <div class="pt-24 pb-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-            <!-- Calendar Grid -->
-            <!-- Note: A real calendar usually requires complex date logic in Java to fill empty days. 
-                 For this demo, we are showing a Stats Summary instead of a full calendar grid 
-                 because rendering a perfect monthly calendar grid in pure Thymeleaf without 
-                 a 'Calendar' object with empty placeholders is tricky. 
-                 
-                 Instead, we'll visualize the Mood Distribution which is cleaner. -->
-
-            <div class="md:col-span-2 glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-6">Mood Distribution</h2>
-
-                <div class="space-y-6">
-                    <div th:each="stat : ${stats}" class="relative">
-                        <div class="flex justify-between items-end mb-2">
-                            <span class="font-medium text-lg uppercase tracking-wider"
-                                th:text="${stat.mood}">HAPPY</span>
-                            <span class="font-bold text-2xl" th:text="${stat.count}">12</span>
-                        </div>
-                        <div class="w-full h-4 bg-slate-800 rounded-full overflow-hidden">
-                            <!-- Calculate width roughly or use arbitrary for demo if total not passed. 
-                                 Ideally total entries should be passed. We'll use style width 50% for demo simplicity 
-                                 or implement percentage calculation in Service. -->
-                            <!-- Let's just use the color block for now without specific width to avoid math errors in template -->
-                            <div class="h-full rounded-full"
-                                th:style="'background-color: ' + ${stat.colorCode} + '; width: ' + (${stat.count} * 5) + '%'">
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-1">days recorded</p>
-                    </div>
-
-                    <div th:if="${stats.empty}" class="text-center text-slate-500 py-10">
-                        No mood data for this month.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Side Panel -->
-            <div class="glass rounded-3xl p-6 flex flex-col items-center justify-center text-center">
-                <div
-                    class="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mb-4 shadow-lg shadow-orange-500/20">
-                    <i class="fas fa-smile text-3xl text-white"></i>
-                </div>
-                <h3 class="text-xl font-bold">Keep Tracking!</h3>
-                <p class="text-slate-400 text-sm mt-2 mb-6">Tracking your mood helps you understand your emotional
-                    patterns.</p>
-                <a th:href="@{/diary/form}"
-                    class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition font-medium">
-                    Add Today's Mood
-                </a>
-            </div>
-
+        <!-- Controls -->
+        <div class="flex justify-between items-center mb-6">
+            <a th:href="@{/diary/calendar(year=${month == 1 ? year - 1 : year}, month=${month == 1 ? 12 : month - 1})}"
+                class="p-2 hover:bg-white/10 rounded-full transition">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <h2 class="text-2xl font-bold" th:text="${monthName} + ' ' + ${year}">JANUARY 2026</h2>
+            <a th:href="@{/diary/calendar(year=${month == 12 ? year + 1 : year}, month=${month == 12 ? 1 : month + 1})}"
+                class="p-2 hover:bg-white/10 rounded-full transition">
+                <i class="fas fa-chevron-right"></i>
+            </a>
         </div>
-    </div>
 
+        <div class="glass rounded-3xl p-6">
+            <!-- Weekday Headers -->
+            <div class="grid grid-cols-7 gap-1 mb-2 text-center text-slate-400 text-sm font-medium">
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+                <div>Sun</div>
+            </div>
+
+            <!-- Days Grid -->
+            <div class="grid grid-cols-7 gap-2 auto-rows-fr">
+
+                <div th:each="day : ${days}"
+                    class="relative aspect-square rounded-xl bg-slate-800/50 flex flex-col items-center justify-center border border-white/5 overflow-hidden transition hover:border-white/20 group">
+
+                    <!-- Empty Slot -->
+                    <div th:if="${day == null}" class="w-full h-full bg-transparent"></div>
+
+                    <!-- Actual Day -->
+                    <div th:if="${day != null}" class="w-full h-full relative p-1">
+                        <span class="absolute top-2 left-3 text-sm z-10 font-medium" th:text="${day}">1</span>
+
+                        <!-- Check if entry exists -->
+                        <div th:if="${entryMap.containsKey(day)}" th:with="entry=${entryMap.get(day)}"
+                            class="w-full h-full flex flex-col">
+
+                            <!-- Image Background -->
+                            <div th:if="${entry.imagePath}" class="absolute inset-0 z-0">
+                                <img th:src="@{${entry.imagePath}}"
+                                    src="https://images.unsplash.com/photo-1493723843684-a63e6d1622ae?q=80&w=600&auto=format&fit=crop"
+                                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                            </div>
+
+                            <!-- Mood Overlay (if no image or always visible?) -->
+                            <div th:unless="${entry.imagePath}" class="absolute inset-0 z-0 opacity-40"
+                                th:style="'background-color: ' + ${entry.mood.colorCode}"></div>
+
+                            <!-- Actions (on hover) -->
+                            <a th:href="@{/diary/edit/{id}(id=${entry.id})}"
+                                class="absolute inset-0 z-20 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition cursor-pointer text-white gap-3">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                        </div>
+
+                        <!-- No Entry: Add Button -->
+                        <a th:unless="${entryMap.containsKey(day)}"
+                            th:href="@{/diary/form(date=${year} + '-' + ${#numbers.formatInteger(month,2)} + '-' + ${#numbers.formatInteger(day,2)})}"
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-white/5 transition text-slate-400 hover:text-white">
+                            <i class="fas fa-plus"></i>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </body>
 
 </html>
