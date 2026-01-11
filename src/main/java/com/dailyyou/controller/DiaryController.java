@@ -58,6 +58,14 @@ public class DiaryController {
         return "redirect:/dashboard";
     }
 
+    @GetMapping("/{id}")
+    public String viewEntry(@PathVariable Long id, Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        DiaryEntry entry = diaryService.getEntry(id, user); 
+        model.addAttribute("entry", entry);
+        return "diary/view";
+    }
+
     @PostMapping("/delete/{id}")
     public String deleteEntry(@PathVariable Long id, Principal principal) {
         User user = userService.findByUsername(principal.getName());

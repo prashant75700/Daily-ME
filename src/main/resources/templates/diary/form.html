@@ -5,6 +5,7 @@
     <title>New Entry - Daily ME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://img.icons8.com/fluency/48/brain.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -75,16 +76,56 @@
             <div>
                 <label class="block text-sm font-medium text-slate-400 mb-2">Photo (Optional)</label>
                 <div class="relative group">
-                    <input type="file" th:field="*{image}" accept="image/*"
-                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                    <div
+                    <input type="file" th:field="*{image}" accept="image/*" id="imageInput"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onchange="previewImage(this)">
+                    <div id="uploadBox"
                         class="w-full border-2 border-dashed border-slate-700 rounded-xl p-4 text-center group-hover:border-blue-500 transition bg-slate-800/50">
                         <i
                             class="fas fa-cloud-upload-alt text-2xl text-slate-500 mb-2 group-hover:text-blue-400 transition"></i>
                         <p class="text-slate-500 text-sm group-hover:text-slate-300">Click to upload an image</p>
                     </div>
+                    <!-- Image Preview Container -->
+                    <div id="previewContainer" class="hidden mt-4 relative">
+                        <img id="imagePreview" src="#" alt="Preview"
+                            class="w-full h-48 object-cover rounded-xl border border-white/10">
+                        <button type="button" onclick="removeImage()"
+                            class="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition shadow-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <script>
+                function previewImage(input) {
+                    const preview = document.getElementById('imagePreview');
+                    const container = document.getElementById('previewContainer');
+                    const uploadBox = document.getElementById('uploadBox');
+
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                            container.classList.remove('hidden');
+                            uploadBox.classList.add('hidden'); // Hide the upload box
+                        }
+
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+
+                function removeImage() {
+                    const input = document.getElementById('imageInput');
+                    const container = document.getElementById('previewContainer');
+                    const uploadBox = document.getElementById('uploadBox');
+
+                    input.value = ''; // Clear file input
+                    container.classList.add('hidden');
+                    uploadBox.classList.remove('hidden');
+                }
+            </script>
 
             <button type="submit"
                 class="w-full py-4 rounded-xl bg-white text-slate-900 font-bold hover:bg-blue-50 transition transform hover:-translate-y-1 shadow-lg shadow-white/10">

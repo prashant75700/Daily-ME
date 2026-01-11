@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Memory - Daily ME</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://img.icons8.com/fluency/48/brain.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-8">
+
+    <!-- Navigation / Back -->
+    <div class="max-w-4xl mx-auto mb-8 flex justify-between items-center animate-fade-in-down">
+        <a th:href="@{/dashboard}" class="flex items-center gap-2 text-slate-400 hover:text-white transition group">
+            <div class="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <span class="font-medium">Back to Timeline</span>
+        </a>
+
+        <div class="flex gap-3">
+            <a th:href="@{/diary/edit/{id}(id=${entry.id})}"
+                class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition flex items-center gap-2">
+                <i class="fas fa-pen text-sm"></i> Edit
+            </a>
+            <form th:action="@{/diary/delete/{id}(id=${entry.id})}" method="post" class="inline"
+                onsubmit="return confirm('Delete this memory?');">
+                <button type="submit"
+                    class="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition flex items-center gap-2">
+                    <i class="fas fa-trash text-sm"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="max-w-4xl mx-auto glass rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up">
+
+        <!-- Header Image (if exists) -->
+        <div th:if="${entry.imagePath}" class="h-64 sm:h-96 w-full relative">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent z-10"></div>
+            <img th:src="@{${entry.imagePath}}" class="w-full h-full object-cover" alt="Memory Image">
+        </div>
+
+        <div class="p-8 sm:p-12 relative z-20" th:classappend="${entry.imagePath == null} ? '' : '-mt-20'">
+
+            <!-- Date & Mood Badge -->
+            <div class="flexflex-wrap items-center gap-4 mb-6">
+                <span class="px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider text-white shadow-lg"
+                    th:style="'background-color: ' + ${entry.mood.colorCode}" th:text="${entry.mood}">HAPPY</span>
+                <span class="text-slate-400 font-medium text-lg">
+                    <i class="far fa-calendar-alt mr-2"></i>
+                    <span th:text="${#temporals.format(entry.date, 'EEEE, MMMM d, yyyy')}">Monday, January 1,
+                        2024</span>
+                </span>
+            </div>
+
+            <!-- Content -->
+            <div class="prose prose-invert prose-lg max-w-none">
+                <p class="text-slate-200 leading-loose whitespace-pre-wrap text-xl font-light"
+                    th:text="${entry.content}">
+                    Today was an incredible day...
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

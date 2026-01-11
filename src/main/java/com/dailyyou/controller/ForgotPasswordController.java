@@ -4,7 +4,6 @@ import com.dailyyou.entity.PasswordResetToken;
 import com.dailyyou.entity.User;
 import com.dailyyou.repository.PasswordResetTokenRepository;
 import com.dailyyou.repository.UserRepository;
-import com.dailyyou.service.EmailService;
 import com.dailyyou.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -20,16 +19,13 @@ public class ForgotPasswordController {
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
-    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
     public ForgotPasswordController(UserRepository userRepository, 
                                   PasswordResetTokenRepository tokenRepository,
-                                  EmailService emailService,
                                   PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
-        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -52,7 +48,7 @@ public class ForgotPasswordController {
         }
         
         if (user.getSecurityQuestion() == null) {
-             model.addAttribute("error", "This account has no security question set. Contact support.");
+             model.addAttribute("error", "Security question not set. Please contact support.");
              return "auth/forgot_password";
         }
 
@@ -70,8 +66,8 @@ public class ForgotPasswordController {
             return "redirect:/login"; // Should not happen
         }
 
-        // Check Answer
-        if (passwordEncoder.matches(answer.toLowerCase().trim(), user.getSecurityAnswer())) {
+        // Check Answer (Case Sensitive Match)
+        if (passwordEncoder.matches(answer.trim(), user.getSecurityAnswer())) {
             // Success! Generate token and let them reset
             String token = UUID.randomUUID().toString();
             PasswordResetToken myToken = new PasswordResetToken(token, user);
@@ -110,6 +106,24 @@ public class ForgotPasswordController {
         }
 
         User user = resetToken.getUser();
+        
+        if (passwordEncoder.matches(password, user.getPassword())) {
+             model.addAttribute("error", "New password cannot be the same as your old password.");
+             model.addAttribute("token", token);
+             return "auth/reset_password";
+        }
+        
+        if (password.length() < 5) {
+             model.addAttribute("error", "Password must be at least 5 characters long.");
+             model.addAttribute("token", token);
+             return "auth/reset_password";
+        }
+        if (!password.matches(".*[A-Z].*")) {
+             model.addAttribute("error", "Password must contain at least one uppercase letter.");
+             model.addAttribute("token", token);
+             return "auth/reset_password";
+        }
+        
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user); // Updates user password
         
