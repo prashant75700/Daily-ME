@@ -55,9 +55,9 @@
                     <label class="block text-sm font-medium text-slate-400 mb-2">Mood</label>
                     <select th:field="*{mood}"
                         class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer appearance-none">
-                        <option value="" disabled selected>Select a mood...</option>
+                        <option value="" disabled selected class="bg-slate-900 text-slate-400">Select a mood...</option>
                         <option th:each="moodOpt : ${T(com.dailyyou.entity.Mood).values()}" th:value="${moodOpt}"
-                            th:text="${moodOpt}"></option>
+                            th:text="${moodOpt}" class="bg-slate-900 text-white"></option>
                     </select>
                     <p class="text-red-400 text-xs mt-1" th:if="${#fields.hasErrors('mood')}" th:errors="*{mood}"></p>
                 </div>
