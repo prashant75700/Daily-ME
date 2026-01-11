@@ -91,6 +91,12 @@
             </a>
         </header>
 
+        <div th:if="${error}"
+            class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-center animate-fade-in-down">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+
         <!-- Entries Grid -->
         <div th:if="${entries.empty}"
             class="text-center py-20 bg-slate-800/50 rounded-3xl border border-dashed border-slate-700">
