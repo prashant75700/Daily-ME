@@ -1,4 +1,4 @@
-# 📔 Daily ME 
+# ![Daily ME Logo](https://img.icons8.com/fluency/48/brain.png) Daily ME 
 
 [![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.java.com/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.1-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
